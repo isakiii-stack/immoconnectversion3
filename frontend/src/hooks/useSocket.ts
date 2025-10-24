@@ -11,9 +11,9 @@ export function useSocket() {
     if (!user) return
 
     // Créer la connexion Socket.IO
-    const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001', {
+    const newSocket = io(process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001', { 
       auth: {
-        token: user.access_token
+        token: user.id
       }
     })
 

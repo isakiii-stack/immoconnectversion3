@@ -45,9 +45,9 @@ export default function ProfilePage() {
         const { data: newProfile, error: createError } = await supabase
           .from('profiles')
           .insert([{
-            id: user.id,
-            email: user.email,
-            full_name: user.user_metadata?.full_name || '',
+            id: user?.id,
+            email: user?.email,
+            full_name: user?.user_metadata?.full_name || '',
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           }])

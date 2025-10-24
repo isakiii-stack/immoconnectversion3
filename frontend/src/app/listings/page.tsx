@@ -237,7 +237,7 @@ export default function ListingsPage() {
                   
                   <div className="mt-4 pt-4 border-t border-gray-200">
                     <p className="text-sm text-gray-500">
-                      Publié par {listing.user?.user_metadata?.full_name || listing.user?.email}
+                      Publié le {new Date(listing.created_at).toLocaleDateString()}
                     </p>
                     <p className="text-xs text-gray-400">
                       {new Date(listing.created_at).toLocaleDateString()}

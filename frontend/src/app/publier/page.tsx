@@ -551,7 +551,7 @@ export default function PublierPage() {
                   Annuler
                 </Button>
               </Link>
-              <Button type="submit" variant="primary" disabled={loading}>
+              <Button type="submit" variant="default" disabled={loading}>
                 {loading ? 'Publication...' : 'Publier l\'annonce'}
               </Button>
             </div>

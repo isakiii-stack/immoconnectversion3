@@ -82,7 +82,7 @@ export function Header() {
                     </Link>
                   </Button>
                   
-                  <Button variant="primary" size="sm" asChild>
+                  <Button variant="default" size="sm" asChild>
                     <Link href="/publier">
                       <Plus className="w-4 h-4 mr-2" />
                       Publier
@@ -96,7 +96,7 @@ export function Header() {
                   <Button variant="ghost" asChild>
                     <Link href="/login">Se connecter</Link>
                   </Button>
-                  <Button variant="primary" asChild>
+                  <Button variant="default" asChild>
                     <Link href="/signup">S'inscrire</Link>
                   </Button>
                 </div>
@@ -156,7 +156,7 @@ export function Header() {
                         </Link>
                       </Button>
                       
-                      <Button variant="primary" asChild className="justify-start">
+                      <Button variant="default" asChild className="justify-start">
                         <Link href="/publier">
                           <Plus className="w-4 h-4 mr-2" />
                           Publier
@@ -168,7 +168,7 @@ export function Header() {
                       <Button variant="ghost" asChild className="justify-start">
                         <Link href="/login">Se connecter</Link>
                       </Button>
-                      <Button variant="primary" asChild className="justify-start">
+                      <Button variant="default" asChild className="justify-start">
                         <Link href="/signup">S'inscrire</Link>
                       </Button>
                     </div>
