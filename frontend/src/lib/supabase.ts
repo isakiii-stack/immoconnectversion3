@@ -27,12 +27,13 @@ export interface Listing {
   title: string
   description?: string
   price: number
-  property_type: string
-  location: string
+  property_type?: string
+  location?: string
+  image_url?: string
   images?: string[]
-  status: 'active' | 'sold' | 'rented'
+  status?: 'active' | 'sold' | 'rented'
   created_at: string
-  updated_at: string
+  updated_at?: string
 }
 
 export interface Message {
