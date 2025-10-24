@@ -1,0 +1,257 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  phone     String?
+  avatar    String?
+  city      String?
+  country   String?
+  isVerified Boolean @default(false)
+  isActive  Boolean  @default(true)
+  role      UserRole @default(BUYER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  listings      Listing[]
+  buyerRequests BuyerRequest[]
+  sentMessages  Message[] @relation("MessageSender")
+  conversations Conversation[] @relation("ConversationUser1")
+  conversations2 Conversation[] @relation("ConversationUser2")
+  favorites     Favorite[]
+  reports       Report[]
+  notifications Notification[]
+
+  @@map("users")
+}
+
+model Listing {
+  id          String      @id @default(cuid())
+  title       String
+  description String
+  price       Float
+  surface     Float
+  rooms       Int
+  bedrooms    Int
+  bathrooms   Int
+  propertyType PropertyType
+  listingType ListingType
+  status      ListingStatus @default(ACTIVE)
+  address     String
+  city        String
+  country     String
+  latitude    Float?
+  longitude   Float?
+  isPremium   Boolean @default(false)
+  views       Int @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  userId    String
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  photos    Photo[]
+  messages  Message[]
+  favorites Favorite[]
+  reports   Report[]
+
+  @@map("listings")
+}
+
+model BuyerRequest {
+  id          String      @id @default(cuid())
+  title       String
+  description String
+  maxPrice    Float
+  minPrice    Float?
+  minSurface  Float?
+  maxSurface  Float?
+  minRooms    Int?
+  maxRooms    Int?
+  propertyType PropertyType?
+  city        String
+  country     String
+  latitude    Float?
+  longitude   Float?
+  status      RequestStatus @default(ACTIVE)
+  views       Int @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  userId    String
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  Message[]
+  favorites Favorite[]
+  reports   Report[]
+
+  @@map("buyer_requests")
+}
+
+model Photo {
+  id        String   @id @default(cuid())
+  url       String
+  alt       String?
+  isMain    Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  // Relations
+  listingId String?
+  listing   Listing? @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@map("photos")
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user1Id String
+  user1   User @relation("ConversationUser1", fields: [user1Id], references: [id], onDelete: Cascade)
+  user2Id String
+  user2   User @relation("ConversationUser2", fields: [user2Id], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@unique([user1Id, user2Id])
+  @@map("conversations")
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  content   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Relations
+  senderId      String
+  sender        User @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  conversationId String
+  conversation  Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  listingId     String?
+  listing       Listing? @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  buyerRequestId String?
+  buyerRequest  BuyerRequest? @relation(fields: [buyerRequestId], references: [id], onDelete: SetNull)
+
+  @@map("messages")
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Relations
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listingId String?
+  listing   Listing? @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  buyerRequestId String?
+  buyerRequest  BuyerRequest? @relation(fields: [buyerRequestId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
+  @@unique([userId, buyerRequestId])
+  @@map("favorites")
+}
+
+model Report {
+  id        String   @id @default(cuid())
+  reason    String
+  description String?
+  status    ReportStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  reporterId String
+  reporter   User @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  listingId String?
+  listing   Listing? @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  buyerRequestId String?
+  buyerRequest  BuyerRequest? @relation(fields: [buyerRequestId], references: [id], onDelete: Cascade)
+
+  @@map("reports")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  type      NotificationType
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Relations
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+// Enums
+enum UserRole {
+  BUYER
+  SELLER
+  BOTH
+  ADMIN
+}
+
+enum PropertyType {
+  APARTMENT
+  HOUSE
+  STUDIO
+  VILLA
+  OFFICE
+  COMMERCIAL
+  LAND
+  OTHER
+}
+
+enum ListingType {
+  SALE
+  RENT
+  BOTH
+}
+
+enum ListingStatus {
+  ACTIVE
+  INACTIVE
+  SOLD
+  RENTED
+  DELETED
+}
+
+enum RequestStatus {
+  ACTIVE
+  INACTIVE
+  FULFILLED
+  DELETED
+}
+
+enum ReportStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum NotificationType {
+  MESSAGE
+  FAVORITE
+  MATCH
+  SYSTEM
+}

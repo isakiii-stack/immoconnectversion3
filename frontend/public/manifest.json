@@ -1,0 +1,16 @@
+{
+  "name": "ImmoConnect",
+  "short_name": "ImmoConnect",
+  "description": "Marketplace Immobilier Bidirectionnelle",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "any",
+      "type": "image/png"
+    }
+  ]
+}
