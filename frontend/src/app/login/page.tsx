@@ -23,7 +23,7 @@ export default function LoginPage() {
       if (error) {
         setError(error.message)
       } else {
-        router.push('/dashboard')
+        router.push('/')
       }
     } catch (err) {
       setError('Erreur lors de la connexion')

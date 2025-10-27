@@ -27,7 +27,6 @@ export default function AnnoncesPage() {
       let query = supabase
         .from('listings')
         .select('*')
-        .eq('status', 'active')
         .order('created_at', { ascending: false })
 
       // Appliquer les filtres

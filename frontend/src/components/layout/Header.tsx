@@ -16,7 +16,7 @@ export function Header() {
   const pathname = usePathname();
 
   const navigation = [
-    { name: 'Annonces', href: '/annonces' },
+    { name: 'Voir les annonces', href: '/annonces' },
     { name: 'Recherches', href: '/recherches' },
     { name: 'Comment ça marche', href: '/comment-ca-marche' },
   ];

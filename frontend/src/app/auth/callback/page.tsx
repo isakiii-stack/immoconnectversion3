@@ -20,7 +20,7 @@ export default function AuthCallbackPage() {
 
         if (data.session) {
           // Utilisateur connecté avec succès
-          router.push('/dashboard')
+          router.push('/')
         } else {
           // Pas de session, rediriger vers login
           router.push('/login')

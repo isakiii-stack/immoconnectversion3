@@ -117,7 +117,7 @@ export default function PublierPage() {
       setSelectedImages([])
       setImagePreviews([])
       
-      // Redirect to listings page after 2 seconds
+      // Rediriger vers la page des annonces après 2 secondes
       setTimeout(() => {
         window.location.href = '/annonces'
       }, 2000)
