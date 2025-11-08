@@ -36,7 +36,7 @@ const io = new Server(server, {
 // Middleware
 app.use(helmet());
 app.use(compression());
-app.use(morgan('combined', { stream: { write: message => logger.info(message.trim()) } }));
+app.use(morgan('combined', { stream: { write: (message: any) => logger.info(message.trim()) } }));
 
 // Rate limiting
 const limiter = rateLimit({
@@ -60,7 +60,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/uploads', express.static('uploads'));
 
 // Health check
-app.get('/health', (req, res) => {
+app.get('/health', (req: any, res: any) => {
   res.json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
