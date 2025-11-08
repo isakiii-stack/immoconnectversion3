@@ -15,8 +15,8 @@ const generateToken = (userId: string): string => {
     { id: userId },
     secret,
     {
-      expiresIn: expiresIn as string
-    }
+      expiresIn: expiresIn
+    } as jwt.SignOptions
   );
 };
 
@@ -28,8 +28,8 @@ const generateRefreshToken = (userId: string): string => {
     { id: userId },
     secret,
     {
-      expiresIn: expiresIn as string
-    }
+      expiresIn: expiresIn
+    } as jwt.SignOptions
   );
 };
 
