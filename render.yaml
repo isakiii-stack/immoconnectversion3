@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: immoconnect-backend
+    env: node
+    buildCommand: cd backend && npm install --no-workspaces --legacy-peer-deps && npx prisma generate && npx tsc
+    startCommand: cd backend && node dist/server.js
+    rootDir: backend
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+
