@@ -6,7 +6,7 @@ import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import 'express-async-errors';
+// Removed express-async-errors - all controllers use try/catch
 
 import { errorHandler } from './middleware/errorHandler';
 import { notFound } from './middleware/notFound';
