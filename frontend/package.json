@@ -5,11 +5,20 @@
   "scripts": {
     "dev": "next dev -H 0.0.0.0",
     "build": "next build",
+    "build:capacitor": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "cap:init": "cap init",
+    "cap:add:android": "cap add android",
+    "cap:sync": "cap sync",
+    "cap:open:android": "cap open android",
+    "cap:build": "npm run build:capacitor && cap sync"
   },
   "dependencies": {
+    "@capacitor/android": "^7.4.4",
+    "@capacitor/cli": "^7.4.4",
+    "@capacitor/core": "^7.4.4",
     "@hookform/resolvers": "^3.3.2",
     "@supabase/auth-helpers-nextjs": "^0.8.7",
     "@supabase/auth-helpers-react": "^0.4.2",

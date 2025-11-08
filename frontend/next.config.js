@@ -1,6 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Pour Capacitor, décommentez la ligne suivante :
+  // output: 'export',
+  
   images: {
+    // Pour Capacitor, décommentez la ligne suivante :
+    // unoptimized: true,
     domains: [
       'localhost',
       'supabase.co',

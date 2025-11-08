@@ -1,9 +1,11 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 
-const inter = Inter({ subsets: ['latin'] })
+// Utilisation d'une police système pour éviter le téléchargement pendant le build
+// Pour utiliser Google Fonts en production, décommentez la ligne suivante :
+// import { Inter } from 'next/font/google'
+// const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'ImmoConnect - Marketplace Immobilier',
@@ -30,7 +32,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr">
-      <body className={inter.className}>
+      <body className="font-sans">
         <Providers>
           {children}
         </Providers>

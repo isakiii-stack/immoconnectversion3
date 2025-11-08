@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Search, User, Heart, MessageCircle, Plus } from 'lucide-react';
+import { Menu, X, Search, User, Heart, MessageCircle, Plus, Download, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { SearchModal } from '@/components/modals/SearchModal';
 import { UserMenu } from '@/components/layout/UserMenu';
@@ -56,6 +56,24 @@ export function Header() {
 
             {/* Desktop Actions */}
             <div className="hidden md:flex items-center space-x-4">
+              {/* Download App Button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  // Télécharger l'APK
+                  const link = document.createElement('a');
+                  link.href = '/app/immoconnect.apk';
+                  link.download = 'ImmoConnect.apk';
+                  link.click();
+                }}
+                className="text-primary-600 border-primary-600 hover:bg-primary-50"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                <span className="hidden lg:inline">Télécharger l'app</span>
+                <span className="lg:hidden">App</span>
+              </Button>
+
               <Button
                 variant="ghost"
                 size="sm"
@@ -140,6 +158,22 @@ export function Header() {
                 ))}
                 
                 <div className="pt-4 border-t border-gray-200">
+                  {/* Download App Button Mobile */}
+                  <Button
+                    variant="outline"
+                    className="justify-start mb-3 text-primary-600 border-primary-600 hover:bg-primary-50"
+                    onClick={() => {
+                      const link = document.createElement('a');
+                      link.href = '/app/immoconnect.apk';
+                      link.download = 'ImmoConnect.apk';
+                      link.click();
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    <Smartphone className="w-4 h-4 mr-2" />
+                    Télécharger l'app
+                  </Button>
+
                   {isAuthenticated ? (
                     <div className="flex flex-col space-y-3">
                       <Button variant="ghost" asChild className="justify-start">
