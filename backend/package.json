@@ -5,7 +5,7 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "nodemon src/server.ts",
-    "build": "npm install --no-workspaces && tsc",
+    "build": "npm ci --ignore-scripts && tsc",
     "start": "node dist/server.js",
     "postinstall": "prisma generate",
     "db:generate": "prisma generate",
