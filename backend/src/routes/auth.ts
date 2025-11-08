@@ -12,7 +12,7 @@ const registerValidation = [
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
   body('firstName').trim().isLength({ min: 2 }).withMessage('First name must be at least 2 characters long'),
   body('lastName').trim().isLength({ min: 2 }).withMessage('Last name must be at least 2 characters long'),
-  body('phone').optional().isMobilePhone().withMessage('Please provide a valid phone number'),
+  body('phone').optional().isMobilePhone('any').withMessage('Please provide a valid phone number'),
   body('city').optional().trim().isLength({ min: 2 }).withMessage('City must be at least 2 characters long'),
   body('country').optional().trim().isLength({ min: 2 }).withMessage('Country must be at least 2 characters long'),
   body('role').optional().isIn(['BUYER', 'SELLER', 'BOTH']).withMessage('Role must be BUYER, SELLER, or BOTH')

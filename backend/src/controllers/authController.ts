@@ -9,22 +9,26 @@ import { AuthRequest } from '../middleware/auth';
 
 // Generate JWT token
 const generateToken = (userId: string): string => {
+  const secret = process.env.JWT_SECRET || 'default-secret';
+  const expiresIn = process.env.JWT_EXPIRES_IN || '15m';
   return jwt.sign(
     { id: userId },
-    process.env.JWT_SECRET || 'default-secret',
+    secret,
     {
-      expiresIn: process.env.JWT_EXPIRES_IN || '15m'
+      expiresIn: expiresIn as string
     }
   );
 };
 
 // Generate refresh token
 const generateRefreshToken = (userId: string): string => {
+  const secret = process.env.JWT_REFRESH_SECRET || 'default-refresh-secret';
+  const expiresIn = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
   return jwt.sign(
     { id: userId },
-    process.env.JWT_REFRESH_SECRET || 'default-refresh-secret',
+    secret,
     {
-      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d'
+      expiresIn: expiresIn as string
     }
   );
 };

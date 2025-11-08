@@ -1,4 +1,4 @@
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import jwt from 'jsonwebtoken';
 import { prisma } from '../config/database';
 import { logger } from '../utils/logger';
@@ -15,15 +15,16 @@ interface AuthenticatedSocket extends Socket {
 
 export const socketHandler = (io: Server) => {
   // Authentication middleware
-  io.use(async (socket: AuthenticatedSocket, next) => {
+  io.use(async (socket: Socket, next: (err?: Error) => void) => {
+    const authSocket = socket as any as AuthenticatedSocket;
     try {
-      const token = socket.handshake.auth.token || socket.handshake.headers.authorization?.replace('Bearer ', '');
+      const token = authSocket.handshake.auth.token || authSocket.handshake.headers.authorization?.replace('Bearer ', '');
       
       if (!token) {
         return next(new Error('Authentication error: No token provided'));
       }
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default-secret') as any;
       
       const user = await prisma.user.findUnique({
         where: { id: decoded.id },
@@ -40,8 +41,8 @@ export const socketHandler = (io: Server) => {
         return next(new Error('Authentication error: User not found or inactive'));
       }
 
-      socket.userId = user.id;
-      socket.user = user;
+      authSocket.userId = user.id;
+      authSocket.user = user;
       next();
     } catch (error) {
       logger.error('Socket authentication error:', error);
@@ -49,7 +50,8 @@ export const socketHandler = (io: Server) => {
     }
   });
 
-  io.on('connection', (socket: AuthenticatedSocket) => {
+  io.on('connection', (socket: Socket) => {
+    const authSocket = socket as any as AuthenticatedSocket;
     logger.info(`User connected: ${socket.user?.email} (${socket.id})`);
 
     // Join user to their personal room
@@ -234,7 +236,7 @@ export const socketHandler = (io: Server) => {
     });
 
     // Handle disconnection
-    socket.on('disconnect', (reason) => {
+    socket.on('disconnect', (reason: any) => {
       logger.info(`User disconnected: ${socket.user?.email} (${socket.id}) - ${reason}`);
       
       // Notify other users that this user went offline
@@ -245,13 +247,13 @@ export const socketHandler = (io: Server) => {
     });
 
     // Handle errors
-    socket.on('error', (error) => {
+    socket.on('error', (error: any) => {
       logger.error(`Socket error for user ${socket.user?.email}:`, error);
     });
   });
 
   // Handle server errors
-  io.on('error', (error) => {
+  io.on('error', (error: any) => {
     logger.error('Socket.IO server error:', error);
   });
 };
