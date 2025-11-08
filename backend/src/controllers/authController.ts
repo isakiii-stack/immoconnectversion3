@@ -8,17 +8,25 @@ import { sendEmail } from '../utils/email';
 import { AuthRequest } from '../middleware/auth';
 
 // Generate JWT token
-const generateToken = (userId: string) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET!, {
-    expiresIn: process.env.JWT_EXPIRES_IN || '15m'
-  });
+const generateToken = (userId: string): string => {
+  return jwt.sign(
+    { id: userId },
+    process.env.JWT_SECRET || 'default-secret',
+    {
+      expiresIn: process.env.JWT_EXPIRES_IN || '15m'
+    }
+  );
 };
 
 // Generate refresh token
-const generateRefreshToken = (userId: string) => {
-  return jwt.sign({ id: userId }, process.env.JWT_REFRESH_SECRET!, {
-    expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d'
-  });
+const generateRefreshToken = (userId: string): string => {
+  return jwt.sign(
+    { id: userId },
+    process.env.JWT_REFRESH_SECRET || 'default-refresh-secret',
+    {
+      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d'
+    }
+  );
 };
 
 export const register = async (req: Request, res: Response) => {
@@ -100,7 +108,7 @@ export const register = async (req: Request, res: Response) => {
     });
   } catch (error) {
     logger.error('Registration error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Internal server error'
     });
@@ -174,7 +182,7 @@ export const login = async (req: Request, res: Response) => {
     });
   } catch (error) {
     logger.error('Login error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Internal server error'
     });
@@ -193,7 +201,7 @@ export const logout = async (req: AuthRequest, res: Response) => {
     });
   } catch (error) {
     logger.error('Logout error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Internal server error'
     });
@@ -239,7 +247,7 @@ export const refreshToken = async (req: Request, res: Response) => {
     });
   } catch (error) {
     logger.error('Refresh token error:', error);
-    res.status(401).json({
+    return res.status(401).json({
       success: false,
       message: 'Invalid refresh token'
     });
@@ -258,7 +266,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
     });
   } catch (error) {
     logger.error('Email verification error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Internal server error'
     });
@@ -312,7 +320,7 @@ export const resendVerification = async (req: Request, res: Response) => {
     });
   } catch (error) {
     logger.error('Resend verification error:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Internal server error'
     });

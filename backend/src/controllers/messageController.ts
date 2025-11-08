@@ -59,7 +59,7 @@ export const getConversations = async (req: AuthRequest, res: Response) => {
 
     // Get unread count for each conversation
     const conversationsWithUnread = await Promise.all(
-      conversations.map(async (conversation) => {
+      conversations.map(async (conversation: any) => {
         const unreadCount = await prisma.message.count({
           where: {
             conversationId: conversation.id,
