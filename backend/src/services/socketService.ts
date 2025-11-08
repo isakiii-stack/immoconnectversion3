@@ -52,46 +52,48 @@ export const socketHandler = (io: Server) => {
 
   io.on('connection', (socket: Socket) => {
     const authSocket = socket as any as AuthenticatedSocket;
-    logger.info(`User connected: ${socket.user?.email} (${socket.id})`);
+    logger.info(`User connected: ${authSocket.user?.email} (${authSocket.id})`);
 
     // Join user to their personal room
-    socket.join(`user:${socket.userId}`);
+    if (authSocket.userId) {
+      authSocket.join(`user:${authSocket.userId}`);
+    }
 
     // Handle joining conversation room
-    socket.on('join-conversation', async (conversationId: string) => {
+    authSocket.on('join-conversation', async (conversationId: string) => {
       try {
         // Verify user is part of this conversation
         const conversation = await prisma.conversation.findFirst({
           where: {
             id: conversationId,
             OR: [
-              { user1Id: socket.userId },
-              { user2Id: socket.userId }
+              { user1Id: authSocket.userId },
+              { user2Id: authSocket.userId }
             ]
           }
         });
 
         if (!conversation) {
-          socket.emit('error', { message: 'Conversation not found' });
+          authSocket.emit('error', { message: 'Conversation not found' });
           return;
         }
 
-        socket.join(`conversation:${conversationId}`);
-        logger.info(`User ${socket.user?.email} joined conversation ${conversationId}`);
+        authSocket.join(`conversation:${conversationId}`);
+        logger.info(`User ${authSocket.user?.email} joined conversation ${conversationId}`);
       } catch (error) {
         logger.error('Join conversation error:', error);
-        socket.emit('error', { message: 'Failed to join conversation' });
+        authSocket.emit('error', { message: 'Failed to join conversation' });
       }
     });
 
     // Handle leaving conversation room
-    socket.on('leave-conversation', (conversationId: string) => {
-      socket.leave(`conversation:${conversationId}`);
-      logger.info(`User ${socket.user?.email} left conversation ${conversationId}`);
+    authSocket.on('leave-conversation', (conversationId: string) => {
+      authSocket.leave(`conversation:${conversationId}`);
+      logger.info(`User ${authSocket.user?.email} left conversation ${conversationId}`);
     });
 
     // Handle sending message
-    socket.on('send-message', async (data: {
+    authSocket.on('send-message', async (data: {
       conversationId: string;
       content: string;
       listingId?: string;
@@ -105,8 +107,8 @@ export const socketHandler = (io: Server) => {
           where: {
             id: conversationId,
             OR: [
-              { user1Id: socket.userId },
-              { user2Id: socket.userId }
+              { user1Id: authSocket.userId },
+              { user2Id: authSocket.userId }
             ]
           },
           include: {
@@ -116,7 +118,7 @@ export const socketHandler = (io: Server) => {
         });
 
         if (!conversation) {
-          socket.emit('error', { message: 'Conversation not found' });
+          authSocket.emit('error', { message: 'Conversation not found' });
           return;
         }
 
@@ -124,7 +126,7 @@ export const socketHandler = (io: Server) => {
         const message = await prisma.message.create({
           data: {
             content,
-            senderId: socket.userId!,
+            senderId: authSocket.userId!,
             conversationId,
             listingId: listingId || null,
             buyerRequestId: buyerRequestId || null
@@ -172,83 +174,83 @@ export const socketHandler = (io: Server) => {
         });
 
         // Emit notification to other user's personal room
-        const otherUserId = conversation.user1Id === socket.userId ? conversation.user2Id : conversation.user1Id;
+        const otherUserId = conversation.user1Id === authSocket.userId ? conversation.user2Id : conversation.user1Id;
         io.to(`user:${otherUserId}`).emit('message-notification', {
           message,
           conversationId,
-          sender: socket.user
+          sender: authSocket.user
         });
 
-        logger.info(`Message sent in conversation ${conversationId} by ${socket.user?.email}`);
+        logger.info(`Message sent in conversation ${conversationId} by ${authSocket.user?.email}`);
       } catch (error) {
         logger.error('Send message error:', error);
-        socket.emit('error', { message: 'Failed to send message' });
+        authSocket.emit('error', { message: 'Failed to send message' });
       }
     });
 
     // Handle typing indicator
-    socket.on('typing', (data: { conversationId: string; isTyping: boolean }) => {
-      socket.to(`conversation:${data.conversationId}`).emit('user-typing', {
-        userId: socket.userId,
+    authSocket.on('typing', (data: { conversationId: string; isTyping: boolean }) => {
+      authSocket.to(`conversation:${data.conversationId}`).emit('user-typing', {
+        userId: authSocket.userId,
         isTyping: data.isTyping,
-        user: socket.user
+        user: authSocket.user
       });
     });
 
     // Handle message read status
-    socket.on('mark-as-read', async (conversationId: string) => {
+    authSocket.on('mark-as-read', async (conversationId: string) => {
       try {
         await prisma.message.updateMany({
           where: {
             conversationId,
-            senderId: { not: socket.userId },
+            senderId: { not: authSocket.userId },
             isRead: false
           },
           data: { isRead: true }
         });
 
         // Notify other user that messages were read
-        socket.to(`conversation:${conversationId}`).emit('messages-read', {
+        authSocket.to(`conversation:${conversationId}`).emit('messages-read', {
           conversationId,
-          readBy: socket.userId
+          readBy: authSocket.userId
         });
 
-        logger.info(`Messages marked as read in conversation ${conversationId} by ${socket.user?.email}`);
+        logger.info(`Messages marked as read in conversation ${conversationId} by ${authSocket.user?.email}`);
       } catch (error) {
         logger.error('Mark as read error:', error);
-        socket.emit('error', { message: 'Failed to mark messages as read' });
+        authSocket.emit('error', { message: 'Failed to mark messages as read' });
       }
     });
 
     // Handle online status
-    socket.on('set-online', () => {
-      socket.broadcast.emit('user-online', {
-        userId: socket.userId,
-        user: socket.user
+    authSocket.on('set-online', () => {
+      authSocket.broadcast.emit('user-online', {
+        userId: authSocket.userId,
+        user: authSocket.user
       });
     });
 
-    socket.on('set-offline', () => {
-      socket.broadcast.emit('user-offline', {
-        userId: socket.userId,
-        user: socket.user
+    authSocket.on('set-offline', () => {
+      authSocket.broadcast.emit('user-offline', {
+        userId: authSocket.userId,
+        user: authSocket.user
       });
     });
 
     // Handle disconnection
-    socket.on('disconnect', (reason: any) => {
-      logger.info(`User disconnected: ${socket.user?.email} (${socket.id}) - ${reason}`);
+    authSocket.on('disconnect', (reason: any) => {
+      logger.info(`User disconnected: ${authSocket.user?.email} (${authSocket.id}) - ${reason}`);
       
       // Notify other users that this user went offline
-      socket.broadcast.emit('user-offline', {
-        userId: socket.userId,
-        user: socket.user
+      authSocket.broadcast.emit('user-offline', {
+        userId: authSocket.userId,
+        user: authSocket.user
       });
     });
 
     // Handle errors
-    socket.on('error', (error: any) => {
-      logger.error(`Socket error for user ${socket.user?.email}:`, error);
+    authSocket.on('error', (error: any) => {
+      logger.error(`Socket error for user ${authSocket.user?.email}:`, error);
     });
   });
 
